@@ -9,12 +9,11 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
     <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
+        /* --- Google Fonts: Inter --- */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         /* --- Base & Animations --- */
         body {
             background-color: #020617; /* A deep navy blue */
@@ -105,6 +104,10 @@
         /* Vote button icon opacity */
         .vote-btn svg { transition: opacity 0.2s ease; }
         .vote-btn.upvoted .downvote-icon, .vote-btn.downvoted .upvote-icon { opacity: 0.4; }
+
+        /* Skeleton Loading */
+        @keyframes pulse { 50% { opacity: .5; } }
+        .skeleton { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
     </style>
 </head>
 <body class="text-gray-100">
@@ -114,7 +117,20 @@
     </div>
 
     <div id="app-container" class="relative z-10">
-        <!-- App will be rendered here -->
+        <!-- App Shell is rendered instantly -->
+        <header class="sticky top-0 z-30 bg-black/30 backdrop-blur-lg border-b border-white/10">
+            <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-3"><div class="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/30"><svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg></div><h1 class="text-2xl font-bold text-white tracking-wider">Nexus</h1></div>
+                <div id="nav-buttons-container" class="hidden md:flex items-center space-x-2 bg-slate-800/50 border border-slate-700 rounded-full p-1">
+                    <!-- Nav buttons will be rendered by JS -->
+                </div>
+                <button id="add-new-btn" class="flex items-center bg-fuchsia-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-fuchsia-500 transition-all duration-300 ease-in-out shadow-lg shadow-fuchsia-600/40 transform hover:scale-105"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add New</button>
+            </nav>
+        </header>
+        <main id="main-content-area" class="container mx-auto px-4 py-8 relative z-10">
+            <!-- Skeletons or content will be rendered here -->
+        </main>
+        <div id="modal-container"></div>
     </div>
 
     <!-- Firebase SDK -->
@@ -137,6 +153,8 @@
         let db, auth, userId = null, currentPage = 'projects', selectedPostId = null;
         let postsCache = [], commentsCache = [];
         const appContainer = document.getElementById('app-container');
+        const mainContentArea = document.getElementById('main-content-area');
+        const navButtonsContainer = document.getElementById('nav-buttons-container');
 
         // --- HELPER FUNCTIONS ---
         function timeAgo(timestamp) {
@@ -151,18 +169,10 @@
         }
 
         // --- TEMPLATING / COMPONENT FUNCTIONS ---
-        const Header = () => `
-            <header class="sticky top-0 z-30 bg-black/30 backdrop-blur-lg border-b border-white/10">
-                <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
-                    <div class="flex items-center space-x-3"><div class="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/30"><svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg></div><h1 class="text-2xl font-bold text-white tracking-wider">Nexus</h1></div>
-                    <div class="hidden md:flex items-center space-x-2 bg-slate-800/50 border border-slate-700 rounded-full p-1">
-                        <button data-page="projects" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'projects' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>Projects</button>
-                        <button data-page="ideas" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'ideas' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3m0-10V7a2 2 0 0 1 2-2h2.76a2 2 0 0 1 1.79 1.11L12 12h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>Ideas</button>
-                        <button data-page="discussions" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'discussions' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Discussions</button>
-                    </div>
-                    <button id="add-new-btn" class="flex items-center bg-fuchsia-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-fuchsia-500 transition-all duration-300 ease-in-out shadow-lg shadow-fuchsia-600/40 transform hover:scale-105"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add New</button>
-                </nav>
-            </header>
+        const NavButtons = () => `
+            <button data-page="projects" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'projects' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>Projects</button>
+            <button data-page="ideas" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'ideas' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3m0-10V7a2 2 0 0 1 2-2h2.76a2 2 0 0 1 1.79 1.11L12 12h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>Ideas</button>
+            <button data-page="discussions" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'discussions' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Discussions</button>
         `;
 
         const VoteButtons = (id, votes, userVote, type) => `
@@ -259,23 +269,46 @@
             </div>
         `;
 
-        const LoadingSpinner = () => `<div class="flex justify-center items-center h-64"><div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-cyan-500"></div></div>`;
+        const SkeletonCard = () => `
+            <div class="card-base flex flex-col skeleton">
+                <div class="h-48 bg-slate-700/50 rounded-t-lg"></div>
+                <div class="p-5">
+                    <div class="h-6 w-3/4 bg-slate-700/50 rounded mb-3"></div>
+                    <div class="space-y-2">
+                        <div class="h-4 bg-slate-700/50 rounded"></div>
+                        <div class="h-4 w-5/6 bg-slate-700/50 rounded"></div>
+                    </div>
+                    <div class="flex justify-between items-center mt-6 pt-4 border-t border-slate-800">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-7 h-7 bg-slate-700/50 rounded-full"></div>
+                            <div class="w-8 h-6 bg-slate-700/50 rounded"></div>
+                            <div class="w-7 h-7 bg-slate-700/50 rounded-full"></div>
+                        </div>
+                        <div class="h-8 w-24 bg-slate-700/50 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const LoadingState = () => `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">${[...Array(6)].map(SkeletonCard).join('')}</div>`;
         const EmptyState = (type) => `<div class="text-center py-20 px-6 bg-slate-900/30 rounded-lg border-2 border-dashed border-slate-700 fade-in"><h3 class="text-2xl font-bold text-white mb-2">${type === 'comments' ? 'No Comments Yet' : "It's quiet in here..."}</h3><p class="text-gray-400">${type === 'comments' ? 'Be the first to share your thoughts!' : `No ${type} have been submitted yet. Be the first to share!`}</p></div>`;
 
         // --- RENDER FUNCTION ---
         function render() {
+            navButtonsContainer.innerHTML = NavButtons();
+            
             let contentHtml = '';
-            if (!userId) { contentHtml = LoadingSpinner(); } 
+            if (!userId) { contentHtml = LoadingState(); } 
             else if (currentPage === 'discussions' && selectedPostId) {
                 const post = postsCache.find(p => p.id === selectedPostId);
-                contentHtml = post ? DiscussionDetailView(post) : LoadingSpinner();
+                contentHtml = post ? DiscussionDetailView(post) : LoadingState();
             } else {
                 if (postsCache.length === 0) { contentHtml = EmptyState(currentPage); } 
                 else if (currentPage === 'discussions') { contentHtml = `<div class="space-y-6">${postsCache.map((p, i) => DiscussionCard(p, i)).join('')}</div>`; } 
                 else { contentHtml = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">${postsCache.map((p, i) => PostCard(p, i)).join('')}</div>`; }
             }
             
-            appContainer.innerHTML = `${Header()}<main id="main-content-area" class="container mx-auto px-4 py-8 relative z-10">${contentHtml}</main><div id="modal-container"></div>`;
+            mainContentArea.innerHTML = contentHtml;
             addEventListeners();
         }
 
@@ -285,10 +318,7 @@
                 const newPage = e.currentTarget.dataset.page;
                 if (currentPage === newPage) return;
                 
-                const mainContainer = document.getElementById('main-content-area');
-                if (mainContainer) {
-                    mainContainer.classList.add('fade-out');
-                }
+                mainContentArea.classList.add('fade-out');
 
                 setTimeout(() => {
                     currentPage = newPage; 
@@ -324,11 +354,15 @@
             const collectionPath = type === 'post' ? `/posts` : `/posts/${selectedPostId}/comments`;
             const itemRef = doc(db, collectionPath, id);
             const voteRef = doc(db, collectionPath, id, 'userVotes', userId);
-            const voteDoc = await getDoc(voteRef);
-            const currentVote = voteDoc.exists() ? voteDoc.data().value : 0;
-            if (voteValue === currentVote) { await deleteDoc(voteRef); await updateDoc(itemRef, { votes: increment(-voteValue) }); } 
-            else { await setDoc(voteRef, { value: voteValue }); await updateDoc(itemRef, { votes: increment(voteValue - currentVote) }); }
-            if (buttonElement) { buttonElement.classList.add('popping'); setTimeout(() => buttonElement.classList.remove('popping'), 300); }
+            try {
+                const voteDoc = await getDoc(voteRef);
+                const currentVote = voteDoc.exists() ? voteDoc.data().value : 0;
+                if (voteValue === currentVote) { await deleteDoc(voteRef); await updateDoc(itemRef, { votes: increment(-voteValue) }); } 
+                else { await setDoc(voteRef, { value: voteValue }); await updateDoc(itemRef, { votes: increment(voteValue - currentVote) }); }
+                if (buttonElement) { buttonElement.classList.add('popping'); setTimeout(() => buttonElement.classList.remove('popping'), 300); }
+            } catch (error) {
+                console.error("Error handling vote:", error);
+            }
         }
 
         async function handleAddNewPost(e) {
@@ -371,12 +405,45 @@
                 const postsDataPromises = querySnapshot.docs.map(async (docSnapshot) => {
                     const post = { id: docSnapshot.id, ...docSnapshot.data() };
                     const voteRef = doc(db, `/posts`, post.id, 'userVotes', userId);
-                    const voteSnap = await getDoc(voteRef); post.userVote = voteSnap.exists() ? voteSnap.data().value : 0;
+                    try {
+                        const voteSnap = await getDoc(voteRef); 
+                        post.userVote = voteSnap.exists() ? voteSnap.data().value : 0;
+                    } catch (e) {
+                        console.warn("Could not get user vote. Client might be offline.", e);
+                        post.userVote = 0;
+                    }
                     return post;
                 });
                 postsCache = await Promise.all(postsDataPromises);
                 postsCache.sort((a, b) => (b.votes || 0) - (a.votes || 0));
                 render();
+            }, (error) => {
+                console.error("Firestore onSnapshot error:", error);
+                if (error.code === 'permission-denied') {
+                    appContainer.innerHTML = `
+                        <div class="fixed inset-0 flex items-center justify-center p-4">
+                            <div class="card-base p-8 max-w-lg text-center fade-in">
+                                <h3 class="text-2xl font-bold text-red-400 mb-2">Action Required: Update Firestore Rules</h3>
+                                <p class="text-gray-300">The database is currently locked down. To allow this app to read and write data, you need to update your Firestore security rules.</p>
+                                <p class="text-gray-400 mt-4">Please follow these steps:</p>
+                                <ol class="text-left text-gray-400 mt-2 list-decimal list-inside">
+                                    <li>Go to your Firebase Console.</li>
+                                    <li>Navigate to the <strong>Firestore Database</strong> section, then click the <strong>Rules</strong> tab.</li>
+                                    <li>Replace the existing rules with the following code:</li>
+                                </ol>
+                                <pre class="bg-slate-900 text-left text-sm text-cyan-300 p-4 rounded-md mt-2 overflow-x-auto"><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}</code></pre>
+                                <p class="text-xs text-gray-500 mt-2">(Note: These rules are for development and allow anyone to read/write. For production, you should implement more secure rules.)</p>
+                                <a href="https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/rules" target="_blank" class="mt-6 inline-block bg-cyan-500 text-gray-900 font-bold py-2 px-4 rounded hover:bg-cyan-400 transition-colors">Go to Firestore Rules</a>
+                            </div>
+                        </div>`;
+                }
             });
         }
 
@@ -388,7 +455,13 @@
                 const commentsPromises = snapshot.docs.map(async (docSnapshot) => {
                     const comment = { id: docSnapshot.id, ...docSnapshot.data() };
                     const voteRef = doc(db, `/posts/${selectedPostId}/comments`, comment.id, 'userVotes', userId);
-                    const voteSnap = await getDoc(voteRef); comment.userVote = voteSnap.exists() ? voteSnap.data().value : 0;
+                    try {
+                        const voteSnap = await getDoc(voteRef); 
+                        comment.userVote = voteSnap.exists() ? voteSnap.data().value : 0;
+                    } catch(e) {
+                         console.warn("Could not get user vote. Client might be offline.", e);
+                        comment.userVote = 0;
+                    }
                     return comment;
                 });
                 commentsCache = await Promise.all(commentsPromises);
@@ -416,22 +489,22 @@
                             await signInAnonymously(auth); 
                         } catch (error) { 
                             console.error("Authentication error:", error); 
-                            const mainContent = document.getElementById('main-content-area');
-                            if (mainContent) {
-                                let userMessage = "Could not sign in anonymously.";
-                                if (error.code === 'auth/operation-not-allowed' || error.code === 'auth/configuration-not-found') {
-                                    userMessage = `
-                                        Authentication failed. This usually means 'Anonymous' sign-in isn't enabled in your Firebase project.
-                                        <br><br>
-                                        <a href="https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers" target="_blank" class="text-cyan-400 underline hover:text-cyan-300">Click here to go to your Firebase Console</a>, then find 'Anonymous' in the list and enable it.
-                                    `;
-                                }
-                                appContainer.innerHTML = `<div class="fixed inset-0 flex items-center justify-center p-4">
-                                                            <div class="card-base p-8 max-w-lg text-center fade-in">
-                                                                <h3 class="text-2xl font-bold text-red-400 mb-2">Authentication Failed</h3>
-                                                                <p class="text-gray-400">${userMessage}</p>
-                                                            </div>
-                                                          </div>`;
+                            if (error.code === 'auth/operation-not-allowed' || error.code === 'auth/configuration-not-found') {
+                                appContainer.innerHTML = `
+                                    <div class="fixed inset-0 flex items-center justify-center p-4">
+                                        <div class="card-base p-8 max-w-lg text-center fade-in">
+                                            <h3 class="text-2xl font-bold text-red-400 mb-2">Action Required</h3>
+                                            <p class="text-gray-300">This application uses anonymous sign-in, which has not been enabled in your Firebase project.</p>
+                                            <p class="text-gray-400 mt-4">Please follow these steps:</p>
+                                            <ol class="text-left text-gray-400 mt-2 list-decimal list-inside">
+                                                <li>Go to your Firebase Console.</li>
+                                                <li>Navigate to the <strong>Authentication</strong> section.</li>
+                                                <li>Click on the <strong>Sign-in method</strong> tab.</li>
+                                                <li>Find <strong>Anonymous</strong> in the provider list and enable it.</li>
+                                            </ol>
+                                            <a href="https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers" target="_blank" class="mt-6 inline-block bg-cyan-500 text-gray-900 font-bold py-2 px-4 rounded hover:bg-cyan-400 transition-colors">Go to Firebase Console</a>
+                                        </div>
+                                    </div>`;
                             }
                         } 
                     }
