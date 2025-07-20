@@ -396,12 +396,40 @@
         async function main() {
             render();
             try {
-                const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app);
+                // Check for valid Firebase config
+                if (Object.keys(firebaseConfig).length === 0) {
+                    throw new Error("Firebase configuration is missing.");
+                }
+                const app = initializeApp(firebaseConfig); 
+                auth = getAuth(app); 
+                db = getFirestore(app);
                 onAuthStateChanged(auth, async (user) => {
-                    if (user) { userId = user.uid; listenToPosts(); } 
-                    else { try { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } } catch (error) { console.error("Authentication error:", error); } }
+                    if (user) { 
+                        userId = user.uid; 
+                        listenToPosts(); 
+                    } else { 
+                        try { 
+                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { 
+                                await signInWithCustomToken(auth, __initial_auth_token); 
+                            } else { 
+                                await signInAnonymously(auth); 
+                            } 
+                        } catch (error) { 
+                            console.error("Authentication error:", error); 
+                        } 
+                    }
                 });
-            } catch (error) { console.error("Firebase initialization failed:", error); appContainer.innerHTML = `<div class="text-red-500 p-4">Error: Could not connect to the backend. Please check the console.</div>`; }
+            } catch (error) { 
+                console.error("Firebase initialization failed:", error); 
+                appContainer.innerHTML = `
+                    <div class="fixed inset-0 flex items-center justify-center p-4">
+                        <div class="card-base p-8 max-w-md text-center">
+                            <h2 class="text-2xl font-bold text-red-400 mb-4">Backend Connection Error</h2>
+                            <p class="text-gray-300">The application could not connect to its backend services. This is likely due to a missing or invalid configuration.</p>
+                            <p class="text-gray-500 text-sm mt-4">Please check the console for more details.</p>
+                        </div>
+                    </div>`;
+            }
         }
 
         main();
