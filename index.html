@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nexus - A hub for sharing and discussing creative projects and ideas.">
+    <title>Nexus - Project & Idea Hub</title>
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- Base & Animations --- */
+        body {
+            background-color: #020617; /* A deep navy blue */
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        
+        /* --- Animated Aurora Background --- */
+        .aurora-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: -1; pointer-events: none; overflow: hidden;
+        }
+        @keyframes move-glow {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+            25% { transform: translate(40vw, 20vh) rotate(90deg) scale(1.2); }
+            50% { transform: translate(-30vw, -30vh) rotate(180deg) scale(1); }
+            75% { transform: translate(20vw, -40vh) rotate(270deg) scale(1.3); }
+            100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+        }
+        .glow {
+            position: absolute; border-radius: 50%;
+            filter: blur(150px); opacity: 0.15;
+        }
+        .glow-1 {
+            top: 10%; left: 10%; width: 40vw; height: 40vw;
+            min-width: 350px; min-height: 350px;
+            background: #0ea5e9; /* sky-500 */
+            animation: move-glow 45s linear infinite;
+        }
+        .glow-2 {
+            bottom: 10%; right: 10%; width: 50vw; height: 50vw;
+            min-width: 400px; min-height: 400px;
+            background: #d946ef; /* fuchsia-500 */
+            animation: move-glow 60s linear infinite reverse;
+        }
+
+        /* --- Animations --- */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .fade-out { animation: fadeOut 0.2s ease-in forwards; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .slide-in { animation: slideIn 0.4s ease-out forwards; }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+        .popping { animation: pop 0.3s ease-out; }
+
+        /* --- Enhanced Card & Glassmorphism --- */
+        .card-base {
+            background-color: rgba(15, 23, 42, 0.5); backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(51, 65, 85, 0.5);
+            border-radius: 0.75rem; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+        }
+        .card-base:before {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 0.75rem; border: 1px solid transparent;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0)) border-box;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            pointer-events: none; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .card-base:hover {
+            transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-color: rgba(14, 165, 233, 0.2);
+        }
+        .card-base:hover:before { opacity: 1; }
+
+        /* --- Custom Select Dropdown --- */
+        .custom-select-container { position: relative; }
+        .custom-select-trigger {
+            position: relative; display: flex; align-items: center; justify-content: space-between;
+            cursor: pointer; width: 100%; background-color: #1f2937; border: 1px solid #374151;
+            border-radius: 0.375rem; padding: 0.5rem 0.75rem; color: white; transition: all 0.2s ease;
+        }
+        .custom-select-trigger:hover, .custom-select-trigger.open { border-color: #db2777; box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.4); }
+        .custom-select-options {
+            position: absolute; top: 100%; left: 0; right: 0; background-color: #1f2937;
+            border: 1px solid #374151; border-radius: 0.375rem; margin-top: 0.25rem;
+            overflow: hidden; z-index: 10; max-height: 0; opacity: 0;
+            transition: max-height 0.3s ease, opacity 0.3s ease;
+        }
+        .custom-select-options.open { max-height: 200px; opacity: 1; }
+        .custom-select-option { padding: 0.5rem 0.75rem; cursor: pointer; transition: background-color 0.2s ease; }
+        .custom-select-option:hover { background-color: #374151; }
+        .custom-select-option.selected { background-color: #0e7490; }
+
+        /* Vote button icon opacity */
+        .vote-btn svg { transition: opacity 0.2s ease; }
+        .vote-btn.upvoted .downvote-icon, .vote-btn.downvoted .upvote-icon { opacity: 0.4; }
+    </style>
+</head>
+<body class="text-gray-100">
+    <div class="aurora-container">
+        <div class="glow glow-1"></div>
+        <div class="glow glow-2"></div>
+    </div>
+
+    <div id="app-container" class="relative z-10">
+        <!-- App will be rendered here -->
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc, increment, setDoc, getDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- GLOBAL STATE AND CONFIG ---
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let db, auth, userId = null, currentPage = 'projects', selectedPostId = null;
+        let postsCache = [], commentsCache = [];
+        const appContainer = document.getElementById('app-container');
+
+        // --- HELPER FUNCTIONS ---
+        function timeAgo(timestamp) {
+            if (!timestamp) return 'just now';
+            const now = new Date();
+            const secondsPast = (now.getTime() - timestamp.toDate().getTime()) / 1000;
+            if (secondsPast < 60) return `${Math.round(secondsPast)}s ago`;
+            if (secondsPast < 3600) return `${Math.round(secondsPast / 60)}m ago`;
+            if (secondsPast <= 86400) return `${Math.round(secondsPast / 3600)}h ago`;
+            const day = timestamp.toDate();
+            return day.toLocaleDateString();
+        }
+
+        // --- TEMPLATING / COMPONENT FUNCTIONS ---
+        const Header = () => `
+            <header class="sticky top-0 z-30 bg-black/30 backdrop-blur-lg border-b border-white/10">
+                <nav class="container mx-auto px-4 py-3 flex justify-between items-center">
+                    <div class="flex items-center space-x-3"><div class="w-10 h-10 bg-cyan-500 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/30"><svg class="w-6 h-6 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg></div><h1 class="text-2xl font-bold text-white tracking-wider">Nexus</h1></div>
+                    <div class="hidden md:flex items-center space-x-2 bg-slate-800/50 border border-slate-700 rounded-full p-1">
+                        <button data-page="projects" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'projects' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>Projects</button>
+                        <button data-page="ideas" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'ideas' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-3m0-10V7a2 2 0 0 1 2-2h2.76a2 2 0 0 1 1.79 1.11L12 12h0a3.13 3.13 0 0 1 3 3.88Z"/></svg>Ideas</button>
+                        <button data-page="discussions" class="nav-button flex items-center px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-300 ${currentPage === 'discussions' ? 'bg-cyan-500 text-gray-900' : 'text-gray-300 hover:bg-slate-700/50 hover:text-white'}"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Discussions</button>
+                    </div>
+                    <button id="add-new-btn" class="flex items-center bg-fuchsia-600 text-white px-4 py-2 rounded-md font-semibold hover:bg-fuchsia-500 transition-all duration-300 ease-in-out shadow-lg shadow-fuchsia-600/40 transform hover:scale-105"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add New</button>
+                </nav>
+            </header>
+        `;
+
+        const VoteButtons = (id, votes, userVote, type) => `
+            <div class="flex items-center space-x-3">
+                <button data-vote="1" data-id="${id}" data-type="${type}" class="vote-btn upvote-btn ${userVote === 1 ? 'upvoted' : ''} transition-all duration-200 transform hover:scale-110 text-green-400">
+                    ${userVote === 1 ?
+                        `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="upvote-icon"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>` :
+                        `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="upvote-icon"><path d="M12 5l-7 7h4v7h6v-7h4z"/></svg>`
+                    }
+                </button>
+                <span class="text-xl font-bold text-cyan-400 w-8 text-center">${votes || 0}</span>
+                <button data-vote="-1" data-id="${id}" data-type="${type}" class="vote-btn downvote-btn ${userVote === -1 ? 'downvoted' : ''} transition-all duration-200 transform hover:scale-110 text-red-400">
+                     ${userVote === -1 ?
+                        `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" class="downvote-icon"><path d="M12 19l7-7h-4V5h-6v7H5z"/></svg>` :
+                        `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="downvote-icon"><path d="M12 19l7-7h-4V5h-6v7H5z"/></svg>`
+                    }
+                </button>
+            </div>
+        `;
+
+        const PostCard = (post, index) => `
+            <div class="card-base flex flex-col fade-in" style="animation-delay: ${index * 50}ms;">
+                ${post.imageUrl ? `<img src="${post.imageUrl}" alt="${post.title}" class="w-full h-48 object-cover rounded-t-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x400/0f172a/38bdf8?text=Image+Error';">` : ''}
+                <div class="p-5 flex flex-col flex-grow min-w-0">
+                    <div class="flex-grow">
+                        <div class="flex justify-between items-start mb-2">
+                           <h3 class="text-xl font-bold text-white break-words pr-2 min-w-0">${post.title}</h3>
+                           <span class="text-xs text-gray-500 flex items-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>${timeAgo(post.createdAt)}</span>
+                        </div>
+                        <p class="text-gray-400 text-sm mb-4 break-words">${post.text}</p>
+                    </div>
+                    <div class="flex justify-between items-center mt-auto pt-4 border-t border-slate-800">
+                        ${VoteButtons(post.id, post.votes, post.userVote, 'post')}
+                        ${post.link ? `<a href="${post.link}" target="_blank" rel="noopener noreferrer" class="text-sm bg-cyan-600/50 text-cyan-200 px-3 py-1 rounded-full hover:bg-cyan-500/70 transition-colors flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>View Project</a>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const DiscussionCard = (post, index) => `
+            <div class="card-base flex items-center space-x-6 p-5 fade-in" style="animation-delay: ${index * 50}ms;">
+                ${VoteButtons(post.id, post.votes, post.userVote, 'post')}
+                <div class="flex-grow cursor-pointer discussion-select min-w-0" data-id="${post.id}">
+                    <h3 class="text-xl font-bold text-white mb-1 truncate">${post.title}</h3>
+                    <div class="flex items-center space-x-4 text-xs text-gray-400">
+                        <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>${post.commentCount || 0} comments</span>
+                        <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Posted ${timeAgo(post.createdAt)}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const AddNewModal = () => `
+            <div id="modal-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+                <div class="bg-slate-900 border border-fuchsia-500/30 rounded-lg shadow-2xl shadow-fuchsia-500/10 w-full max-w-lg p-8 m-4 slide-in">
+                    <h2 class="text-2xl font-bold text-white mb-6">Add a new submission</h2>
+                    <form id="add-new-form">
+                        <div class="mb-4"><label class="block text-cyan-400 text-sm font-bold mb-2" for="modal-type">Type</label><div class="custom-select-container"><div class="custom-select-trigger" id="custom-select-trigger"><span id="custom-select-value">Project</span><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300"><path d="m6 9 6 6 6-6"/></svg></div><div class="custom-select-options" id="custom-select-options"><div class="custom-select-option selected" data-value="projects">Project</div><div class="custom-select-option" data-value="ideas">Idea</div><div class="custom-select-option" data-value="discussions">Discussion</div></div><input type="hidden" id="modal-type" value="projects"></div></div>
+                        <div id="project-fields"><div class="mb-4"><label class="block text-cyan-400 text-sm font-bold mb-2" for="imageUrl">Image URL</label><input id="imageUrl" type="url" class="w-full bg-slate-800 border border-slate-700 rounded py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-fuchsia-500" /></div><div class="mb-6"><label class="block text-cyan-400 text-sm font-bold mb-2" for="link">Project Link</label><input id="link" type="url" class="w-full bg-slate-800 border border-slate-700 rounded py-2 px-3 text-white" /></div></div>
+                        <div class="mb-4"><label class="block text-cyan-400 text-sm font-bold mb-2" for="title">Title</label><input id="title" type="text" class="w-full bg-slate-800 border border-slate-700 rounded py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-fuchsia-500" required /></div>
+                        <div class="mb-4"><label class="block text-cyan-400 text-sm font-bold mb-2" for="text">Description / Post</label><textarea id="text" class="w-full bg-slate-800 border border-slate-700 rounded py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-fuchsia-500 h-24" required></textarea></div>
+                        <div class="flex items-center justify-end space-x-4"><button type="button" id="modal-cancel-btn" class="text-gray-400 hover:text-white transition-colors">Cancel</button><button type="submit" id="modal-submit-btn" class="bg-fuchsia-600 text-white font-bold py-2 px-4 rounded hover:bg-fuchsia-500 transition-colors shadow-lg shadow-fuchsia-600/40 w-28">Submit</button></div>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        const DiscussionDetailView = (post) => `
+            <div class="max-w-4xl mx-auto fade-in">
+                <button id="back-to-discussions" class="flex items-center text-cyan-400 hover:text-cyan-300 mb-6"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>Back to Discussions</button>
+                <div class="card-base p-6">
+                    <div class="flex justify-between items-baseline"><h2 class="text-3xl font-bold text-white break-words">${post.title}</h2><span class="text-sm text-gray-500 flex-shrink-0 ml-4">${timeAgo(post.createdAt)}</span></div>
+                    <p class="text-gray-300 mt-4 break-words">${post.text}</p>
+                    <div class="mt-4 pt-4 border-t border-slate-800">${VoteButtons(post.id, post.votes, post.userVote, 'post')}</div>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-2xl font-semibold text-white mb-4">Comments (${commentsCache.length})</h3>
+                    <form id="add-comment-form" class="mb-6">
+                        <textarea id="new-comment-text" class="w-full bg-slate-800 border border-slate-700 rounded py-2 px-3 text-white leading-tight focus:outline-none focus:ring-2 focus:ring-fuchsia-500 h-24" placeholder="Add your comment..."></textarea>
+                        <button type="submit" id="comment-submit-btn" class="mt-2 bg-fuchsia-600 text-white font-bold py-2 px-4 rounded hover:bg-fuchsia-500 transition-colors shadow-lg shadow-fuchsia-600/40 w-40">Post Comment</button>
+                    </form>
+                    <div id="comments-list" class="space-y-4">${commentsCache.length > 0 ? commentsCache.map((c, i) => Comment(c, i)).join('') : EmptyState('comments')}</div>
+                </div>
+            </div>
+        `;
+
+        const Comment = (comment, index) => `
+            <div class="card-base flex space-x-4 p-4 fade-in" style="animation-delay: ${index * 50}ms;">
+                ${VoteButtons(comment.id, comment.votes, comment.userVote, 'comment')}
+                <div class="flex-grow py-2 min-w-0">
+                    <p class="text-gray-300 break-words">${comment.text}</p>
+                    <div class="text-xs text-gray-500 mt-2">by ${comment.authorId.substring(0, 8)}... • ${timeAgo(comment.createdAt)}</div>
+                </div>
+            </div>
+        `;
+
+        const LoadingSpinner = () => `<div class="flex justify-center items-center h-64"><div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-cyan-500"></div></div>`;
+        const EmptyState = (type) => `<div class="text-center py-20 px-6 bg-slate-900/30 rounded-lg border-2 border-dashed border-slate-700 fade-in"><h3 class="text-2xl font-bold text-white mb-2">${type === 'comments' ? 'No Comments Yet' : "It's quiet in here..."}</h3><p class="text-gray-400">${type === 'comments' ? 'Be the first to share your thoughts!' : `No ${type} have been submitted yet. Be the first to share!`}</p></div>`;
+
+        // --- RENDER FUNCTION ---
+        function render() {
+            let contentHtml = '';
+            if (!userId) { contentHtml = LoadingSpinner(); } 
+            else if (currentPage === 'discussions' && selectedPostId) {
+                const post = postsCache.find(p => p.id === selectedPostId);
+                contentHtml = post ? DiscussionDetailView(post) : LoadingSpinner();
+            } else {
+                if (postsCache.length === 0) { contentHtml = EmptyState(currentPage); } 
+                else if (currentPage === 'discussions') { contentHtml = `<div class="space-y-6">${postsCache.map((p, i) => DiscussionCard(p, i)).join('')}</div>`; } 
+                else { contentHtml = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">${postsCache.map((p, i) => PostCard(p, i)).join('')}</div>`; }
+            }
+            
+            appContainer.innerHTML = `${Header()}<main id="main-content-area" class="container mx-auto px-4 py-8 relative z-10">${contentHtml}</main><div id="modal-container"></div>`;
+            addEventListeners();
+        }
+
+        // --- EVENT LISTENERS ---
+        function addEventListeners() {
+            document.querySelectorAll('.nav-button').forEach(btn => btn.addEventListener('click', (e) => { 
+                const newPage = e.currentTarget.dataset.page;
+                if (currentPage === newPage) return;
+                
+                const mainContainer = document.getElementById('main-content-area');
+                if (mainContainer) {
+                    mainContainer.classList.add('fade-out');
+                }
+
+                setTimeout(() => {
+                    currentPage = newPage; 
+                    selectedPostId = null; 
+                    listenToPosts(); 
+                }, 200);
+            }));
+            document.getElementById('add-new-btn')?.addEventListener('click', () => {
+                document.getElementById('modal-container').innerHTML = AddNewModal();
+                document.getElementById('modal-cancel-btn').addEventListener('click', () => { document.getElementById('modal-container').innerHTML = ''; });
+                document.getElementById('add-new-form').addEventListener('submit', handleAddNewPost);
+                const trigger = document.getElementById('custom-select-trigger'), options = document.getElementById('custom-select-options'), hiddenInput = document.getElementById('modal-type'), valueSpan = document.getElementById('custom-select-value'), projectFields = document.getElementById('project-fields');
+                trigger.addEventListener('click', () => { options.classList.toggle('open'); trigger.classList.toggle('open'); });
+                document.querySelectorAll('.custom-select-option').forEach(option => {
+                    option.addEventListener('click', () => {
+                        document.querySelector('.custom-select-option.selected').classList.remove('selected');
+                        option.classList.add('selected');
+                        hiddenInput.value = option.dataset.value;
+                        valueSpan.textContent = option.textContent;
+                        options.classList.remove('open'); trigger.classList.remove('open');
+                        projectFields.style.display = hiddenInput.value === 'projects' ? 'block' : 'none';
+                    });
+                });
+            });
+            document.querySelectorAll('.vote-btn').forEach(btn => btn.addEventListener('click', (e) => { const button = e.currentTarget; handleVote(button.dataset.id, parseInt(button.dataset.vote), button.dataset.type, button); }));
+            document.querySelectorAll('.discussion-select').forEach(card => card.addEventListener('click', (e) => { selectedPostId = e.currentTarget.dataset.id; listenToComments(); render(); }));
+            document.getElementById('back-to-discussions')?.addEventListener('click', () => { selectedPostId = null; commentsCache = []; render(); });
+            document.getElementById('add-comment-form')?.addEventListener('submit', handleAddComment);
+        }
+        
+        async function handleVote(id, voteValue, type, buttonElement) {
+            if (!userId) return;
+            const collectionPath = type === 'post' ? `/artifacts/${appId}/public/data/posts` : `/artifacts/${appId}/public/data/posts/${selectedPostId}/comments`;
+            const itemRef = doc(db, collectionPath, id);
+            const voteRef = doc(db, collectionPath, id, 'userVotes', userId);
+            const voteDoc = await getDoc(voteRef);
+            const currentVote = voteDoc.exists() ? voteDoc.data().value : 0;
+            if (voteValue === currentVote) { await deleteDoc(voteRef); await updateDoc(itemRef, { votes: increment(-voteValue) }); } 
+            else { await setDoc(voteRef, { value: voteValue }); await updateDoc(itemRef, { votes: increment(voteValue - currentVote) }); }
+            if (buttonElement) { buttonElement.classList.add('popping'); setTimeout(() => buttonElement.classList.remove('popping'), 300); }
+        }
+
+        async function handleAddNewPost(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('modal-submit-btn');
+            submitBtn.disabled = true; submitBtn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>`;
+            const form = e.target;
+            const type = form.querySelector('#modal-type').value, title = form.querySelector('#title').value, text = form.querySelector('#text').value;
+            if (!title || !text) { submitBtn.disabled = false; submitBtn.textContent = 'Submit'; return; }
+            let postData = { title, text, type, votes: 0, authorId: userId, createdAt: serverTimestamp(), commentCount: 0 };
+            if (type === 'projects') {
+                postData.imageUrl = form.querySelector('#imageUrl').value || `https://placehold.co/600x400/0f172a/38bdf8?text=${encodeURIComponent(title)}`;
+                postData.link = form.querySelector('#link').value;
+            }
+            try { await addDoc(collection(db, `/artifacts/${appId}/public/data/posts`), postData); document.getElementById('modal-container').innerHTML = ''; } 
+            catch (error) { console.error("Error adding document: ", error); submitBtn.disabled = false; submitBtn.textContent = 'Submit'; }
+        }
+
+        async function handleAddComment(e) {
+            e.preventDefault();
+            const submitBtn = document.getElementById('comment-submit-btn');
+            const textArea = document.getElementById('new-comment-text');
+            const text = textArea.value;
+            if (!text.trim()) return;
+            submitBtn.disabled = true; submitBtn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>`;
+            const commentsCollectionPath = `/artifacts/${appId}/public/data/posts/${selectedPostId}/comments`;
+            try {
+                await addDoc(collection(db, commentsCollectionPath), { text, authorId: userId, createdAt: serverTimestamp(), votes: 0 });
+                await updateDoc(doc(db, `/artifacts/${appId}/public/data/posts`, selectedPostId), { commentCount: increment(1) });
+                textArea.value = '';
+            } catch (error) { console.error("Error adding comment: ", error); }
+            finally { submitBtn.disabled = false; submitBtn.textContent = 'Post Comment'; }
+        }
+
+        let unsubscribePosts = null;
+        function listenToPosts() {
+            if (unsubscribePosts) unsubscribePosts();
+            const q = query(collection(db, `/artifacts/${appId}/public/data/posts`), where("type", "==", currentPage));
+            unsubscribePosts = onSnapshot(q, async (querySnapshot) => {
+                const postsDataPromises = querySnapshot.docs.map(async (docSnapshot) => {
+                    const post = { id: docSnapshot.id, ...docSnapshot.data() };
+                    const voteRef = doc(db, `/artifacts/${appId}/public/data/posts`, post.id, 'userVotes', userId);
+                    const voteSnap = await getDoc(voteRef); post.userVote = voteSnap.exists() ? voteSnap.data().value : 0;
+                    return post;
+                });
+                postsCache = await Promise.all(postsDataPromises);
+                postsCache.sort((a, b) => (b.votes || 0) - (a.votes || 0));
+                render();
+            });
+        }
+
+        let unsubscribeComments = null;
+        function listenToComments() {
+            if (unsubscribeComments) unsubscribeComments();
+            const commentsQuery = query(collection(db, `/artifacts/${appId}/public/data/posts/${selectedPostId}/comments`));
+            unsubscribeComments = onSnapshot(commentsQuery, async (snapshot) => {
+                const commentsPromises = snapshot.docs.map(async (docSnapshot) => {
+                    const comment = { id: docSnapshot.id, ...docSnapshot.data() };
+                    const voteRef = doc(db, `/artifacts/${appId}/public/data/posts/${selectedPostId}/comments`, comment.id, 'userVotes', userId);
+                    const voteSnap = await getDoc(voteRef); comment.userVote = voteSnap.exists() ? voteSnap.data().value : 0;
+                    return comment;
+                });
+                commentsCache = await Promise.all(commentsPromises);
+                commentsCache.sort((a, b) => (b.votes || 0) - (a.votes || 0));
+                if (selectedPostId) {
+                    const commentsListEl = document.getElementById('comments-list');
+                    if (commentsListEl) { commentsListEl.innerHTML = commentsCache.length > 0 ? commentsCache.map((c, i) => Comment(c, i)).join('') : EmptyState('comments'); addEventListeners(); } 
+                    else { render(); }
+                }
+            });
+        }
+
+        async function main() {
+            render();
+            try {
+                const app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app);
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) { userId = user.uid; listenToPosts(); } 
+                    else { try { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await signInWithCustomToken(auth, __initial_auth_token); } else { await signInAnonymously(auth); } } catch (error) { console.error("Authentication error:", error); } }
+                });
+            } catch (error) { console.error("Firebase initialization failed:", error); appContainer.innerHTML = `<div class="text-red-500 p-4">Error: Could not connect to the backend. Please check the console.</div>`; }
+        }
+
+        main();
+    </script>
+</body>
+</html>
