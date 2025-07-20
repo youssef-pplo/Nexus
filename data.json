@@ -1,1 +1,17 @@
-
+{
+  "posts": [
+    {
+      "id": "proj_i3rbly",
+      "type": "projects",
+      "title": "i3rbly",
+      "text": "i3rbly provides you with highly accurate grammatical analysis (I‘rāb) for any Arabic sentence, no matter how complex or difficult. This helps you verify sentence structure and understand every detail correctly. The platform makes it incredibly easy to get the I‘rāb of any Arabic sentence, allowing you to improve your language skills and always be confident that you're writing and answering correctly.",
+      "imageUrl": "https://i3rbly.com/imgs/i3rabbx.png",
+      "link": "https://i3rbly.com/",
+      "votes": 256,
+      "commentCount": 0,
+      "createdAt": "2025-07-20T16:08:00.000Z"
+    }
+  ],
+  "comments": {},
+  "userVotes": {}
+}
