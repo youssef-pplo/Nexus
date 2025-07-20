@@ -129,28 +129,44 @@
 
     <script type="module">
         // --- LOCAL DATA STORE ---
-        let localData = {
-            posts: [
-                { id: 'proj1', type: 'projects', title: 'Project Alpha: AI-Powered Art Generator', text: 'A deep learning model that generates unique artwork based on textual descriptions. Built with Python and TensorFlow.', imageUrl: 'https://placehold.co/600x400/0ea5e9/ffffff?text=Project+Alpha', link: '#', votes: 128, commentCount: 12, createdAt: new Date(Date.now() - 86400000 * 2) },
-                { id: 'idea1', type: 'ideas', title: 'Idea: A Social Network for Gardeners', text: 'An app where users can share photos of their plants, get advice, and trade seeds with local gardeners.', votes: 95, commentCount: 25, createdAt: new Date(Date.now() - 3600000 * 5) },
-                { id: 'disc1', type: 'discussions', title: 'Discussion: What is the future of web development?', text: 'With the rise of AI and low-code platforms, what skills will be most valuable for web developers in the next 5 years?', votes: 72, commentCount: 3, createdAt: new Date(Date.now() - 60000 * 15) },
-                { id: 'proj2', type: 'projects', title: 'Project Beta: Real-time Transit Tracker', text: 'A web app showing live bus and train locations on a map for our city. Uses the GTFS API and Leaflet.js.', imageUrl: 'https://placehold.co/600x400/db2777/ffffff?text=Project+Beta', link: '#', votes: 64, commentCount: 8, createdAt: new Date(Date.now() - 86400000 * 5) },
-                { id: 'idea2', type: 'ideas', title: 'Idea: Gamified Language Learning App', text: 'Imagine Duolingo but with a full RPG-style story and quests that you complete by learning new vocabulary and grammar.', votes: 150, commentCount: 42, createdAt: new Date(Date.now() - 3600000 * 24) },
-            ],
-            comments: {
-                'disc1': [
-                    { id: 'c1', postId: 'disc1', authorId: 'user_abc', text: 'I think WebAssembly is going to be huge!', votes: 15, createdAt: new Date(Date.now() - 60000 * 10) },
-                    { id: 'c2', postId: 'disc1', authorId: 'user_def', text: 'Definitely agree on WebAssembly. Also, server-side rendering with frameworks like Next.js will become even more standard.', votes: 8, createdAt: new Date(Date.now() - 60000 * 8) },
-                    { id: 'c3', postId: 'disc1', authorId: 'user_ghi', text: 'Low-code tools will handle the simple stuff, so developers can focus on complex logic and integrations.', votes: 12, createdAt: new Date(Date.now() - 60000 * 5) },
-                ]
-            },
-            userVotes: {} // e.g., { 'proj1': 1, 'c1': -1 }
-        };
+        let localData = {};
+        
+        // --- DATA PERSISTENCE FUNCTIONS ---
+        function saveData() {
+            localStorage.setItem('nexusData', JSON.stringify(localData));
+        }
+
+        async function loadData() {
+            const savedData = localStorage.getItem('nexusData');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                // Re-hydrate Date objects
+                parsedData.posts.forEach(p => p.createdAt = new Date(p.createdAt));
+                Object.values(parsedData.comments).forEach(commentList => {
+                    commentList.forEach(c => c.createdAt = new Date(c.createdAt));
+                });
+                localData = parsedData;
+            } else {
+                try {
+                    const response = await fetch('./data.json');
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const defaultData = await response.json();
+                    defaultData.posts.forEach(p => p.createdAt = new Date(p.createdAt));
+                    Object.values(defaultData.comments).forEach(commentList => {
+                        commentList.forEach(c => c.createdAt = new Date(c.createdAt));
+                    });
+                    localData = defaultData;
+                    saveData();
+                } catch (error) {
+                    console.error("Failed to load initial data from data.json:", error);
+                    localData = { posts: [], comments: {}, userVotes: {} };
+                }
+            }
+        }
 
         // --- GLOBAL STATE ---
         let currentPage = 'projects';
         let selectedPostId = null;
-        const appContainer = document.getElementById('app-container');
         const mainContentArea = document.getElementById('main-content-area');
         const navButtonsContainer = document.getElementById('nav-buttons-container');
 
@@ -343,6 +359,7 @@
             }
 
             if (buttonElement) { buttonElement.classList.add('popping'); setTimeout(() => buttonElement.classList.remove('popping'), 300); }
+            saveData();
             render();
         }
 
@@ -367,6 +384,7 @@
             
             localData.posts.push(newPost);
             document.getElementById('modal-container').innerHTML = '';
+            saveData();
             render();
         }
 
@@ -394,11 +412,13 @@
             if (post) post.commentCount++;
             
             textArea.value = '';
+            saveData();
             render();
         }
         
         // --- INITIALIZATION ---
-        function main() {
+        async function main() {
+            await loadData();
             render();
         }
 
