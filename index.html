@@ -120,12 +120,20 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, onSnapshot, query, where, doc, updateDoc, increment, setDoc, getDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- GLOBAL STATE AND CONFIG ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = {
+            apiKey: "AIzaSyAe-zXAPN5_7Ub2JszsBULmYv-tDEjA1Q4",
+            authDomain: "nexus-56be7.firebaseapp.com",
+            projectId: "nexus-56be7",
+            storageBucket: "nexus-56be7.firebasestorage.app",
+            messagingSenderId: "108587177932",
+            appId: "1:108587177932:web:50f0e47a764beb62d42f69",
+            measurementId: "G-V1RZBYMG58"
+        };
+        
         let db, auth, userId = null, currentPage = 'projects', selectedPostId = null;
         let postsCache = [], commentsCache = [];
         const appContainer = document.getElementById('app-container');
@@ -313,7 +321,7 @@
         
         async function handleVote(id, voteValue, type, buttonElement) {
             if (!userId) return;
-            const collectionPath = type === 'post' ? `/artifacts/${appId}/public/data/posts` : `/artifacts/${appId}/public/data/posts/${selectedPostId}/comments`;
+            const collectionPath = type === 'post' ? `/posts` : `/posts/${selectedPostId}/comments`;
             const itemRef = doc(db, collectionPath, id);
             const voteRef = doc(db, collectionPath, id, 'userVotes', userId);
             const voteDoc = await getDoc(voteRef);
@@ -335,7 +343,7 @@
                 postData.imageUrl = form.querySelector('#imageUrl').value || `https://placehold.co/600x400/0f172a/38bdf8?text=${encodeURIComponent(title)}`;
                 postData.link = form.querySelector('#link').value;
             }
-            try { await addDoc(collection(db, `/artifacts/${appId}/public/data/posts`), postData); document.getElementById('modal-container').innerHTML = ''; } 
+            try { await addDoc(collection(db, `/posts`), postData); document.getElementById('modal-container').innerHTML = ''; } 
             catch (error) { console.error("Error adding document: ", error); submitBtn.disabled = false; submitBtn.textContent = 'Submit'; }
         }
 
@@ -346,10 +354,10 @@
             const text = textArea.value;
             if (!text.trim()) return;
             submitBtn.disabled = true; submitBtn.innerHTML = `<div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white mx-auto"></div>`;
-            const commentsCollectionPath = `/artifacts/${appId}/public/data/posts/${selectedPostId}/comments`;
+            const commentsCollectionPath = `/posts/${selectedPostId}/comments`;
             try {
                 await addDoc(collection(db, commentsCollectionPath), { text, authorId: userId, createdAt: serverTimestamp(), votes: 0 });
-                await updateDoc(doc(db, `/artifacts/${appId}/public/data/posts`, selectedPostId), { commentCount: increment(1) });
+                await updateDoc(doc(db, `/posts`, selectedPostId), { commentCount: increment(1) });
                 textArea.value = '';
             } catch (error) { console.error("Error adding comment: ", error); }
             finally { submitBtn.disabled = false; submitBtn.textContent = 'Post Comment'; }
@@ -358,11 +366,11 @@
         let unsubscribePosts = null;
         function listenToPosts() {
             if (unsubscribePosts) unsubscribePosts();
-            const q = query(collection(db, `/artifacts/${appId}/public/data/posts`), where("type", "==", currentPage));
+            const q = query(collection(db, `/posts`), where("type", "==", currentPage));
             unsubscribePosts = onSnapshot(q, async (querySnapshot) => {
                 const postsDataPromises = querySnapshot.docs.map(async (docSnapshot) => {
                     const post = { id: docSnapshot.id, ...docSnapshot.data() };
-                    const voteRef = doc(db, `/artifacts/${appId}/public/data/posts`, post.id, 'userVotes', userId);
+                    const voteRef = doc(db, `/posts`, post.id, 'userVotes', userId);
                     const voteSnap = await getDoc(voteRef); post.userVote = voteSnap.exists() ? voteSnap.data().value : 0;
                     return post;
                 });
@@ -375,11 +383,11 @@
         let unsubscribeComments = null;
         function listenToComments() {
             if (unsubscribeComments) unsubscribeComments();
-            const commentsQuery = query(collection(db, `/artifacts/${appId}/public/data/posts/${selectedPostId}/comments`));
+            const commentsQuery = query(collection(db, `/posts/${selectedPostId}/comments`));
             unsubscribeComments = onSnapshot(commentsQuery, async (snapshot) => {
                 const commentsPromises = snapshot.docs.map(async (docSnapshot) => {
                     const comment = { id: docSnapshot.id, ...docSnapshot.data() };
-                    const voteRef = doc(db, `/artifacts/${appId}/public/data/posts/${selectedPostId}/comments`, comment.id, 'userVotes', userId);
+                    const voteRef = doc(db, `/posts/${selectedPostId}/comments`, comment.id, 'userVotes', userId);
                     const voteSnap = await getDoc(voteRef); comment.userVote = voteSnap.exists() ? voteSnap.data().value : 0;
                     return comment;
                 });
@@ -396,10 +404,6 @@
         async function main() {
             render();
             try {
-                // Check for valid Firebase config
-                if (Object.keys(firebaseConfig).length === 0) {
-                    throw new Error("Firebase configuration is missing.");
-                }
                 const app = initializeApp(firebaseConfig); 
                 auth = getAuth(app); 
                 db = getFirestore(app);
@@ -409,13 +413,26 @@
                         listenToPosts(); 
                     } else { 
                         try { 
-                            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { 
-                                await signInWithCustomToken(auth, __initial_auth_token); 
-                            } else { 
-                                await signInAnonymously(auth); 
-                            } 
+                            await signInAnonymously(auth); 
                         } catch (error) { 
                             console.error("Authentication error:", error); 
+                            const mainContent = document.getElementById('main-content-area');
+                            if (mainContent) {
+                                let userMessage = "Could not sign in anonymously.";
+                                if (error.code === 'auth/operation-not-allowed' || error.code === 'auth/configuration-not-found') {
+                                    userMessage = `
+                                        Authentication failed. This usually means 'Anonymous' sign-in isn't enabled in your Firebase project.
+                                        <br><br>
+                                        <a href="https://console.firebase.google.com/project/${firebaseConfig.projectId}/authentication/providers" target="_blank" class="text-cyan-400 underline hover:text-cyan-300">Click here to go to your Firebase Console</a>, then find 'Anonymous' in the list and enable it.
+                                    `;
+                                }
+                                appContainer.innerHTML = `<div class="fixed inset-0 flex items-center justify-center p-4">
+                                                            <div class="card-base p-8 max-w-lg text-center fade-in">
+                                                                <h3 class="text-2xl font-bold text-red-400 mb-2">Authentication Failed</h3>
+                                                                <p class="text-gray-400">${userMessage}</p>
+                                                            </div>
+                                                          </div>`;
+                            }
                         } 
                     }
                 });
