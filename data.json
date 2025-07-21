@@ -12,26 +12,48 @@
       "createdAt": "2025-07-20T16:08:00.000Z"
     },
     {
-      "id": "proj_flora_ai",
+      "id": "proj_spline",
       "type": "projects",
-      "title": "Flora-AI: Smart Plant Care System",
-      "text": "An IoT device that monitors soil moisture, light, and nutrients, providing automated watering and plant health alerts to your phone. Built with Raspberry Pi and a custom React Native app.",
-      "imageUrl": "https://placehold.co/600x400/22c55e/ffffff?text=Flora-AI",
-      "link": "#",
-      "votes": 184,
-      "commentCount": 22,
-      "createdAt": "2025-07-19T10:25:00.000Z"
+      "title": "Spline - Collaborative 3D Design Tool",
+      "text": "A powerful, easy-to-use 3D design tool that runs directly in the browser. Create scenes, models, and animations, and collaborate with your team in real-time.",
+      "imageUrl": "https://pbs.twimg.com/media/GE4042CaMAA3356?format=jpg&name=large",
+      "link": "https://spline.design/",
+      "votes": 352,
+      "commentCount": 41,
+      "createdAt": "2025-07-21T11:00:00.000Z"
     },
     {
-      "id": "proj_chronoverse",
+      "id": "proj_photopea",
       "type": "projects",
-      "title": "ChronoVerse: VR Museum Experience",
-      "text": "Explore world-famous museums from your home in stunningly realistic virtual reality. Walk through the Louvre or the British Museum with our custom Unity-based VR application.",
-      "imageUrl": "https://placehold.co/600x400/8b5cf6/ffffff?text=ChronoVerse",
-      "link": "#",
-      "votes": 212,
-      "commentCount": 35,
-      "createdAt": "2025-07-18T18:45:00.000Z"
+      "title": "Photopea - Advanced Online Photo Editor",
+      "text": "A free, web-based photo and graphics editor that supports PSD, XCF, Sketch, XD and CDR formats. A powerful alternative to Photoshop that runs in your browser.",
+      "imageUrl": "https://www.photopea.com/promo/icon512.png",
+      "link": "https://www.photopea.com/",
+      "votes": 415,
+      "commentCount": 58,
+      "createdAt": "2025-07-18T09:30:00.000Z"
+    },
+    {
+      "id": "proj_excalidraw",
+      "type": "projects",
+      "title": "Excalidraw - Virtual Collaborative Whiteboard",
+      "text": "An open-source virtual whiteboard for sketching hand-drawn like diagrams. Perfect for brainstorming, planning, and visualizing ideas with a team.",
+      "imageUrl": "https://excalidraw.com/og-image.png",
+      "link": "https://excalidraw.com/",
+      "votes": 289,
+      "commentCount": 33,
+      "createdAt": "2025-07-19T15:20:00.000Z"
+    },
+    {
+      "id": "proj_threejs_journey",
+      "type": "projects",
+      "title": "Three.js Journey - The Ultimate WebGL Course",
+      "text": "An extensive and highly-rated course by Bruno Simon that teaches you everything you need to know about creating stunning 3D websites with Three.js.",
+      "imageUrl": "https://threejs-journey.com/assets/images/share-fb.png",
+      "link": "https://threejs-journey.com/",
+      "votes": 321,
+      "commentCount": 26,
+      "createdAt": "2025-07-17T14:00:00.000Z"
     },
     {
       "id": "idea_skillswap",
