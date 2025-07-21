@@ -16,7 +16,7 @@
       "type": "projects",
       "title": "Spline - Collaborative 3D Design Tool",
       "text": "A powerful, easy-to-use 3D design tool that runs directly in the browser. Create scenes, models, and animations, and collaborate with your team in real-time.",
-      "imageUrl": "https://pbs.twimg.com/media/GE4042CaMAA3356?format=jpg&name=large",
+      "imageUrl": "https://blog-frontend.envato.com/uploads/sites/2/2024/11/editor-download-768x412.webp",
       "link": "https://spline.design/",
       "votes": 352,
       "commentCount": 41,
@@ -27,7 +27,7 @@
       "type": "projects",
       "title": "Photopea - Advanced Online Photo Editor",
       "text": "A free, web-based photo and graphics editor that supports PSD, XCF, Sketch, XD and CDR formats. A powerful alternative to Photoshop that runs in your browser.",
-      "imageUrl": "https://www.photopea.com/promo/icon512.png",
+      "imageUrl": "https://lh3.googleusercontent.com/-NKZaWsekdu4/YoUsz_k4ACI/AAAAAAAAfDI/1Cd7xHUBfvE3PMHSS-9YGbUm_L_mi9r6gCO8EGAYYCw/icon512.png",
       "link": "https://www.photopea.com/",
       "votes": 415,
       "commentCount": 58,
@@ -38,7 +38,7 @@
       "type": "projects",
       "title": "Excalidraw - Virtual Collaborative Whiteboard",
       "text": "An open-source virtual whiteboard for sketching hand-drawn like diagrams. Perfect for brainstorming, planning, and visualizing ideas with a team.",
-      "imageUrl": "https://excalidraw.com/og-image.png",
+      "imageUrl": "https://excalidraw.com/apple-touch-icon.png",
       "link": "https://excalidraw.com/",
       "votes": 289,
       "commentCount": 33,
@@ -49,7 +49,7 @@
       "type": "projects",
       "title": "Three.js Journey - The Ultimate WebGL Course",
       "text": "An extensive and highly-rated course by Bruno Simon that teaches you everything you need to know about creating stunning 3D websites with Three.js.",
-      "imageUrl": "https://threejs-journey.com/assets/images/share-fb.png",
+      "imageUrl": "https://canada1.discourse-cdn.com/flex035/uploads/threejs/optimized/2X/e/e4f86d2200d2d35c30f7b1494e96b9595ebc2751_2_496x500.png",
       "link": "https://threejs-journey.com/",
       "votes": 321,
       "commentCount": 26,
@@ -74,6 +74,24 @@
       "createdAt": "2025-07-17T20:00:00.000Z"
     },
     {
+      "id": "idea_local_eats",
+      "type": "ideas",
+      "title": "LocalEats: A Hyper-Local Food Delivery Service",
+      "text": "Instead of big chains, this service would focus exclusively on small, family-owned restaurants within a 2-mile radius, offering lower fees and faster delivery times.",
+      "votes": 92,
+      "commentCount": 15,
+      "createdAt": "2025-07-21T14:00:00.000Z"
+    },
+    {
+      "id": "idea_ar_measure",
+      "type": "ideas",
+      "title": "AR Measurement Tool for Interior Design",
+      "text": "Use your phone's camera to measure rooms and furniture in augmented reality. See how a new sofa would fit in your living room before you buy it.",
+      "votes": 210,
+      "commentCount": 38,
+      "createdAt": "2025-07-16T09:00:00.000Z"
+    },
+    {
       "id": "disc_remote",
       "type": "discussions",
       "title": "Is full-time remote work the future, or will we return to the office?",
@@ -90,7 +108,25 @@
       "votes": 65,
       "commentCount": 3,
       "createdAt": "2025-07-19T14:00:00.000Z"
-    }
+    },
+    {
+        "id": "disc_ai_ethics",
+        "type": "discussions",
+        "title": "The Ethical Implications of Advanced AI",
+        "text": "As AI becomes more sophisticated, what are the biggest ethical challenges we face? Job displacement, algorithmic bias, and autonomous decision-making are just the beginning. Let's have a serious conversation.",
+        "votes": 140,
+        "commentCount": 5,
+        "createdAt": "2025-07-21T12:00:00.000Z"
+      },
+      {
+        "id": "disc_dev_burnout",
+        "type": "discussions",
+        "title": "How do you deal with developer burnout?",
+        "text": "It feels like the pressure to constantly learn new technologies and deliver faster is leading to widespread burnout. What are your strategies for staying passionate and avoiding exhaustion in this field?",
+        "votes": 178,
+        "commentCount": 6,
+        "createdAt": "2025-07-18T11:00:00.000Z"
+      }
   ],
   "comments": {
     "disc_remote": [
@@ -152,6 +188,21 @@
         "votes": 6,
         "createdAt": "2025-07-19T15:00:00.000Z"
       }
+    ],
+    "disc_ai_ethics": [
+        { "id": "c_ai_1", "postId": "disc_ai_ethics", "authorId": "user_phil", "text": "The biggest issue is accountability. If an autonomous AI makes a mistake, who is responsible? The programmer? The company? The AI itself?", "votes": 35, "createdAt": "2025-07-21T12:05:00.000Z" },
+        { "id": "c_ai_2", "postId": "disc_ai_ethics", "authorId": "user_data", "text": "Data privacy is a huge concern. These models are trained on vast amounts of data, and we need to ensure personal information isn't being misused.", "votes": 28, "createdAt": "2025-07-21T12:10:00.000Z" },
+        { "id": "c_ai_3", "postId": "disc_ai_ethics", "authorId": "user_econ", "text": "I'm more worried about the economic impact. We need to start planning for universal basic income or similar solutions for when large-scale job displacement occurs.", "votes": 25, "createdAt": "2025-07-21T12:20:00.000Z" },
+        { "id": "c_ai_4", "postId": "disc_ai_ethics", "authorId": "user_optimist", "text": "While there are risks, think of the potential benefits! AI could solve some of humanity's biggest problems, from climate change to disease.", "votes": 18, "createdAt": "2025-07-21T12:25:00.000Z" },
+        { "id": "c_ai_5", "postId": "disc_ai_ethics", "authorId": "user_artist", "text": "What about creativity? I'm an artist, and I'm concerned that AI-generated art will devalue human creativity.", "votes": 12, "createdAt": "2025-07-21T12:30:00.000Z" }
+    ],
+    "disc_dev_burnout": [
+        { "id": "c_burn_1", "postId": "disc_dev_burnout", "authorId": "user_senior", "text": "Setting clear boundaries is key. I don't check work messages after 6 PM. It's essential to disconnect.", "votes": 45, "createdAt": "2025-07-18T11:05:00.000Z" },
+        { "id": "c_burn_2", "postId": "disc_dev_burnout", "authorId": "user_junior", "text": "It's hard as a junior dev. I feel like I have to work twice as hard to prove myself, and that leads to long hours.", "votes": 20, "createdAt": "2025-07-18T11:10:00.000Z" },
+        { "id": "c_burn_3", "postId": "disc_dev_burnout", "authorId": "user_hobby", "text": "Having a non-coding hobby has been a lifesaver for me. It gives my brain a chance to switch off and think about something else.", "votes": 32, "createdAt": "2025-07-18T11:15:00.000Z" },
+        { "id": "c_burn_4", "postId": "disc_dev_burnout", "authorId": "user_manager2", "text": "As a manager, I encourage my team to take their vacation time and to be open about their workload. A burnt-out team is an unproductive team.", "votes": 28, "createdAt": "2025-07-18T11:20:00.000Z" },
+        { "id": "c_burn_5", "postId": "disc_dev_burnout", "authorId": "user_career", "text": "I switched to a four-day work week, and it's been a game-changer for my mental health and focus.", "votes": 19, "createdAt": "2025-07-18T11:25:00.000Z" },
+        { "id": "c_burn_6", "postId": "disc_dev_burnout", "authorId": "user_realist", "text": "Sometimes you just have to accept that not every project will be exciting. The key is to find satisfaction in solving problems, even the boring ones.", "votes": 15, "createdAt": "2025-07-18T11:30:00.000Z" }
     ]
   },
   "userVotes": {}
