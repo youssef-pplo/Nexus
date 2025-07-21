@@ -3,15 +3,134 @@
     {
       "id": "proj_i3rbly",
       "type": "projects",
-      "title": "i3rbly",
-      "text": "i3rbly provides you with highly accurate grammatical analysis (I‘rāb) for any Arabic sentence, no matter how complex or difficult. This helps you verify sentence structure and understand every detail correctly. The platform makes it incredibly easy to get the I‘rāb of any Arabic sentence, allowing you to improve your language skills and always be confident that you're writing and answering correctly.",
+      "title": "i3rbly - AI Arabic Grammar Tool",
+      "text": "i3rbly provides you with highly accurate grammatical analysis (I‘rāb) for any Arabic sentence, no matter how complex or difficult. This helps you verify sentence structure and understand every detail correctly.",
       "imageUrl": "https://i3rbly.com/imgs/i3rabbx.png",
       "link": "https://i3rbly.com/",
       "votes": 256,
-      "commentCount": 0,
+      "commentCount": 18,
       "createdAt": "2025-07-20T16:08:00.000Z"
+    },
+    {
+      "id": "proj_flora_ai",
+      "type": "projects",
+      "title": "Flora-AI: Smart Plant Care System",
+      "text": "An IoT device that monitors soil moisture, light, and nutrients, providing automated watering and plant health alerts to your phone. Built with Raspberry Pi and a custom React Native app.",
+      "imageUrl": "https://placehold.co/600x400/22c55e/ffffff?text=Flora-AI",
+      "link": "#",
+      "votes": 184,
+      "commentCount": 22,
+      "createdAt": "2025-07-19T10:25:00.000Z"
+    },
+    {
+      "id": "proj_chronoverse",
+      "type": "projects",
+      "title": "ChronoVerse: VR Museum Experience",
+      "text": "Explore world-famous museums from your home in stunningly realistic virtual reality. Walk through the Louvre or the British Museum with our custom Unity-based VR application.",
+      "imageUrl": "https://placehold.co/600x400/8b5cf6/ffffff?text=ChronoVerse",
+      "link": "#",
+      "votes": 212,
+      "commentCount": 35,
+      "createdAt": "2025-07-18T18:45:00.000Z"
+    },
+    {
+      "id": "idea_skillswap",
+      "type": "ideas",
+      "title": "SkillSwap: A Community Skill Bartering App",
+      "text": "An app where you can trade skills with people in your community. Trade an hour of coding for an hour of guitar lessons, no money involved. It would help build stronger local communities.",
+      "votes": 155,
+      "commentCount": 29,
+      "createdAt": "2025-07-20T11:15:00.000Z"
+    },
+    {
+      "id": "idea_narrateme",
+      "type": "ideas",
+      "title": "NarrateMe: AI-Powered Bedtime Stories",
+      "text": "An AI that writes short, personalized stories for children where they are the main character, based on a few simple prompts like their name, favorite animal, and favorite color.",
+      "votes": 118,
+      "commentCount": 19,
+      "createdAt": "2025-07-17T20:00:00.000Z"
+    },
+    {
+      "id": "disc_remote",
+      "type": "discussions",
+      "title": "Is full-time remote work the future, or will we return to the office?",
+      "text": "Let's discuss the pros and cons. What has your experience been? Is hybrid the best compromise or is one model clearly superior for productivity and well-being? I'm curious to hear everyone's thoughts.",
+      "votes": 88,
+      "commentCount": 4,
+      "createdAt": "2025-07-21T09:30:00.000Z"
+    },
+    {
+      "id": "disc_glassmorphism",
+      "type": "discussions",
+      "title": "Design Trends: Is 'Glassmorphism' here to stay?",
+      "text": "We've seen the frosted glass look everywhere, from macOS to Windows 11 and countless web designs. Do you think it's a timeless trend like minimalism, or will it fade away like other fads?",
+      "votes": 65,
+      "commentCount": 3,
+      "createdAt": "2025-07-19T14:00:00.000Z"
     }
   ],
-  "comments": {},
+  "comments": {
+    "disc_remote": [
+      {
+        "id": "c_remote_1",
+        "postId": "disc_remote",
+        "authorId": "user_flex",
+        "text": "I love remote work! The flexibility is unmatched. I can't imagine going back to a daily commute.",
+        "votes": 22,
+        "createdAt": "2025-07-21T09:35:00.000Z"
+      },
+      {
+        "id": "c_remote_2",
+        "postId": "disc_remote",
+        "authorId": "user_social",
+        "text": "I miss the social interaction of the office. For me, hybrid is the way to go. I get the best of both worlds.",
+        "votes": 15,
+        "createdAt": "2025-07-21T09:40:00.000Z"
+      },
+      {
+        "id": "c_remote_3",
+        "postId": "disc_remote",
+        "authorId": "user_prod",
+        "text": "Productivity has gone way up since I went remote. No more pointless meetings or interruptions.",
+        "votes": 18,
+        "createdAt": "2025-07-21T10:05:00.000Z"
+      },
+      {
+        "id": "c_remote_4",
+        "postId": "disc_remote",
+        "authorId": "user_manager",
+        "text": "As a manager, it's been a challenge. It's harder to build team culture and mentor junior members without in-person interaction.",
+        "votes": 7,
+        "createdAt": "2025-07-21T10:15:00.000Z"
+      }
+    ],
+    "disc_glassmorphism": [
+      {
+        "id": "c_glass_1",
+        "postId": "disc_glassmorphism",
+        "authorId": "user_dev",
+        "text": "It looks cool, but can be an accessibility nightmare if not done right. Contrast ratios are super important.",
+        "votes": 19,
+        "createdAt": "2025-07-19T14:10:00.000Z"
+      },
+      {
+        "id": "c_glass_2",
+        "postId": "disc_glassmorphism",
+        "authorId": "user_design",
+        "text": "I think it'll evolve. It's the next logical step after flat design, adding a sense of depth and hierarchy.",
+        "votes": 12,
+        "createdAt": "2025-07-19T14:15:00.000Z"
+      },
+      {
+        "id": "c_glass_3",
+        "postId": "disc_glassmorphism",
+        "authorId": "user_skeptic",
+        "text": "It's just a fad. In two years, we'll be back to something else. It's too visually busy for complex interfaces.",
+        "votes": 6,
+        "createdAt": "2025-07-19T15:00:00.000Z"
+      }
+    ]
+  },
   "userVotes": {}
 }
